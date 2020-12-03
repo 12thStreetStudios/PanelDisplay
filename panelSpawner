@@ -1,0 +1,9 @@
+#!/bin/bash
+TimesToSpawn=100
+if [ -n $1 ] 
+then
+	TimesToSpawn=$1	
+fi
+for ((i = 0 ; i < $TimesToSpawn ; i++)); do
+	fortune | panel
+done

@@ -1,0 +1,87 @@
+#!/usr/bin/python3
+# the d stands for DADDY
+from gpiozero import LED
+import socket
+from _thread import *
+import threading
+import os
+from time import sleep
+import RPi.GPIO as GPIO
+import subprocess # for running panel
+
+# set GPIO pin mode
+GPIO.setmode(GPIO.BCM)
+# setup notify led output
+GPIO.setup(3, GPIO.OUT)
+GPIO.output(3, GPIO.HIGH)
+
+queue = []
+print_lock = threading.Lock()
+running = True
+queueThread = False
+global processing
+processing = False
+
+# thread function that is spawned when a connection happens
+def addToQueue(conn):
+    sbuffer = ""
+    while True:
+        # data received from client
+        data = conn.recv(1024)
+        if not data:
+            print("End of Client Stream")
+            # release print lock
+            print_lock.release()
+            break
+
+        sbuffer += data.decode("ascii")
+    if data == "quit":
+        running = False
+    else: 
+        queue.append(sbuffer.replace("\n", " "))
+        start_new_thread(printQueue, (queue, ))
+    conn.close()
+    GPIO.output(3, GPIO.LOW)
+    sleep(0.35)
+    GPIO.output(3, GPIO.HIGH)
+    
+
+def printQueue(q):
+    global processing
+    while processing:
+        sleep(0.2)
+    processing = True
+    while len(q) > 0:
+        temp = q.pop()
+        result = subprocess.run(
+            ["/usr/bin/panel"], 
+            input=bytes(temp,'utf-8')
+        )
+        sleep(0.2)
+    processing = False
+
+def Main():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Create Socket Object
+    host = ""
+    port = 1500 # reserve port for the service
+    s.bind((host, port))
+    print("Socket binded to port", port)
+
+    # put socket in listening mode
+    s.listen(5) 
+    print("Socket is listening")
+    # loop until exited
+    while running:
+        # establish connection with client
+        c, addr = s.accept()
+
+        # lock acquired
+        print_lock.acquire()
+        print('Connected to :', addr[0], ':', addr[1])
+
+        # Start a new thread and reurn its identifier
+        start_new_thread(addToQueue, (c,))
+    s.close()
+
+if __name__ == '__main__':
+    Main()
