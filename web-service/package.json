@@ -1,0 +1,20 @@
+{
+  "name": "web-service",
+  "version": "1.0.0",
+  "description": "web service for pi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "PanelDisplay"
+  },
+  "author": "Russell Abernethy",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "express": "^4.17.1"
+  }
+}

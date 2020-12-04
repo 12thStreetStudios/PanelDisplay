@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-const { exec } = require("child_process")
+const axios = require('axios');
 
 
 export default class MessageForm extends Component {
@@ -17,7 +17,9 @@ export default class MessageForm extends Component {
   }
 
   handleSubmit(event) {
-    exec(this.state.value + " | pwrite")
+    axios.post('192.168.0.2:1234/', this.state.value)
+        .then(response => this.setState({ resp: response.data}))
+    console.log(this.state.resp);
     event.preventDefault();
   }
 
