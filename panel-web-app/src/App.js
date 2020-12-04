@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-const axios = require('axios');
-
 
 export default class MessageForm extends Component {
   constructor(props) {
@@ -15,11 +13,16 @@ export default class MessageForm extends Component {
   handleChange(event) {
     this.setState({value: event.target.value})
   }
+  
+  handleSubmit(event) {  
+    fetch('https://cors-anywhere.herokuapp.com/http://192.168.0.2:1234/panel', {
+      method: 'post',
+      //mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({msg: this.state.value})
+    }).then(res => console.log(res))
+      .catch(e => console.log(e));
 
-  handleSubmit(event) {
-    axios.post('/panel', this.state.value)
-        .then(response => this.setState({ resp: response.data}))
-    console.log(this.state.resp);
     event.preventDefault();
   }
 

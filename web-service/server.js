@@ -1,25 +1,25 @@
 const express = require('express');
 const { exec } = require('child_process');
 const app = express();
+const PORT = process.env.PORT || 1234;
 
-app.post('/panel', function (req, res) {
-    console.log("Post Recieved")
-    exec('echo -e '+ req +' | panel', (err, stdout, stderr) => {
+app.listen(PORT, () => {
+    console.log('Server listening on port '+ PORT);
+});
+
+app.post('/panel/', (req, res) => {
+    console.log(req.body.msg)
+    exec(`echo -e ${req.body.msg} | pwrite`, (err) => {
         if (err) {
           // node couldn't execute the command
           return;
         }
-
-        // the *entire* stdout and stderr (buffered)
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
     });
 
-    res.send(req);
+    res.send("received");
 });
 
-const PORT = process.env.PORT || 1234;
-app.listen(PORT, () => {
-    console.log('Server listening on port '+ PORT);
-});
+
+
+
 
