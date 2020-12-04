@@ -17,7 +17,7 @@ export default class MessageForm extends Component {
   }
 
   handleSubmit(event) {
-    axios.post('192.168.0.2:1234/', this.state.value)
+    axios.post('/panel', this.state.value)
         .then(response => this.setState({ resp: response.data}))
     console.log(this.state.resp);
     event.preventDefault();

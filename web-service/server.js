@@ -2,18 +2,19 @@ const express = require('express');
 const { exec } = require('child_process');
 const app = express();
 
-app.post('/', function (req, res) {
-    exec(`echo -e ${req} | pwrite`, (err, stdout, stderr) => {
-        if(err) {
-            console.error(err);
+app.post('/panel', function (req, res) {
+    console.log("Post Recieved")
+    exec('echo -e '+ req +' | panel', (err, stdout, stderr) => {
+        if (err) {
+          // node couldn't execute the command
+          return;
         }
-        if (stderr) {
-            console.log(`stderr: ${stderr}`);
-            return;
-        }
+
+        // the *entire* stdout and stderr (buffered)
         console.log(`stdout: ${stdout}`);
-        
+        console.log(`stderr: ${stderr}`);
     });
+
     res.send(req);
 });
 
